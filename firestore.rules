@@ -1,0 +1,52 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidSubmission(data) {
+      return data.keys().hasAll([
+          'studentDisplayName', 'startedAt', 'completedAt',
+          'houseAnswers', 'mbtiAnswers', 'houseScores',
+          'primaryHouse', 'secondaryHouse', 'houseTie',
+          'mbtiType', 'mbtiAxisScores', 'mbtiAxisStrength'
+        ])
+        && data.studentDisplayName is string
+        && data.studentDisplayName.size() > 0
+        && data.studentDisplayName.size() <= 40
+        && data.houseAnswers.size() == 12
+        && data.mbtiAnswers.size() == 23
+        && data.primaryHouse in ['gryffindor', 'ravenclaw', 'hufflepuff', 'slytherin']
+        && data.secondaryHouse in ['gryffindor', 'ravenclaw', 'hufflepuff', 'slytherin']
+        && data.mbtiType is string
+        && data.mbtiType.size() == 4;
+    }
+
+    match /teachers/{teacherId} {
+      allow read, write: if isSignedIn() && request.auth.uid == teacherId;
+    }
+
+    match /joinCodes/{code} {
+      allow get: if true;
+      allow list: if false;
+      allow create, update: if isSignedIn() && request.resource.data.teacherUid == request.auth.uid;
+      allow delete: if isSignedIn()
+        && resource.data.teacherUid == request.auth.uid;
+    }
+
+    match /classes/{classId} {
+      allow read, update, delete: if isSignedIn() && resource.data.teacherUid == request.auth.uid;
+      allow create: if isSignedIn() && request.resource.data.teacherUid == request.auth.uid;
+
+      match /submissions/{submissionId} {
+        allow create: if isValidSubmission(request.resource.data);
+        allow read: if isSignedIn()
+          && get(/databases/$(database)/documents/classes/$(classId)).data.teacherUid == request.auth.uid;
+        allow update, delete: if false;
+      }
+    }
+  }
+}
