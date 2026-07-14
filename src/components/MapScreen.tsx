@@ -3,7 +3,7 @@ import { MAP_ZONES, type QuizNode } from '../data/mapZones';
 import courtyardBg from '../assets/courtyard-bg.png';
 
 const NODE_SPACING = 96;
-const AMPLITUDE = 90;
+const AMPLITUDE = 32;
 
 function nodePosition(index: number) {
   const x = 50 + Math.sin(index * 0.85) * AMPLITUDE;
@@ -25,11 +25,14 @@ export function MapScreen({ nodes, currentIndex, onSelectNode }: MapScreenProps)
     MAP_ZONES.find((z) => z.id === zoneId)?.themeColor ?? '#888';
 
   return (
-    <div className="relative mx-auto max-w-md overflow-y-auto px-4 pb-32" style={{ height: '100dvh' }}>
+    <div
+      className="relative mx-auto max-w-md overflow-x-hidden overflow-y-auto px-4 pb-32"
+      style={{ height: '100dvh' }}
+    >
       <div
         className="fixed inset-0 -z-10"
         style={{
-          backgroundImage: `linear-gradient(to bottom, rgba(11,8,18,0.55), rgba(11,8,18,0.88)), url(${courtyardBg})`,
+          backgroundImage: `linear-gradient(to bottom, rgba(11,8,18,0.2), rgba(11,8,18,0.5)), url(${courtyardBg})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
