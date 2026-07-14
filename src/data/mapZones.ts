@@ -70,6 +70,8 @@ export const QUIZ_NODES: QuizNode[] = MAP_ZONES.flatMap((zone) =>
 
 export const TOTAL_QUESTIONS = QUIZ_NODES.length;
 
+export const TRIALS_NODES = QUIZ_NODES.filter((n) => n.zoneId === 'trials');
+
 export function zoneStartIndex(zoneId: ZoneId): number {
   return QUIZ_NODES.findIndex((n) => n.zoneId === zoneId);
 }

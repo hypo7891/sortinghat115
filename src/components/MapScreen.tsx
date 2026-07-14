@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
-import { QUIZ_NODES, MAP_ZONES, TOTAL_QUESTIONS } from '../data/mapZones';
+import { MAP_ZONES, type QuizNode } from '../data/mapZones';
+import courtyardBg from '../assets/courtyard-bg.png';
 
 const NODE_SPACING = 96;
 const AMPLITUDE = 90;
@@ -11,19 +12,29 @@ function nodePosition(index: number) {
 }
 
 interface MapScreenProps {
+  nodes: QuizNode[];
   currentIndex: number;
   onSelectNode: (index: number) => void;
 }
 
-export function MapScreen({ currentIndex, onSelectNode }: MapScreenProps) {
-  const pathHeight = 60 + (TOTAL_QUESTIONS - 1) * NODE_SPACING + 80;
-  const avatarPos = nodePosition(Math.min(currentIndex, TOTAL_QUESTIONS - 1));
+export function MapScreen({ nodes, currentIndex, onSelectNode }: MapScreenProps) {
+  const pathHeight = 60 + (nodes.length - 1) * NODE_SPACING + 80;
+  const avatarPos = nodePosition(Math.min(currentIndex, nodes.length - 1));
 
   const zoneColor = (zoneId: string) =>
     MAP_ZONES.find((z) => z.id === zoneId)?.themeColor ?? '#888';
 
   return (
     <div className="relative mx-auto max-w-md overflow-y-auto px-4 pb-32" style={{ height: '100dvh' }}>
+      <div
+        className="fixed inset-0 -z-10"
+        style={{
+          backgroundImage: `linear-gradient(to bottom, rgba(11,8,18,0.55), rgba(11,8,18,0.88)), url(${courtyardBg})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      />
+
       <div className="relative" style={{ height: pathHeight }}>
         <svg
           className="pointer-events-none absolute left-0 top-0"
@@ -33,7 +44,7 @@ export function MapScreen({ currentIndex, onSelectNode }: MapScreenProps) {
           preserveAspectRatio="none"
         >
           <polyline
-            points={QUIZ_NODES.map((_, i) => {
+            points={nodes.map((_, i) => {
               const p = nodePosition(i);
               return `${p.x},${p.y}`;
             }).join(' ')}
@@ -44,7 +55,7 @@ export function MapScreen({ currentIndex, onSelectNode }: MapScreenProps) {
           />
         </svg>
 
-        {QUIZ_NODES.map((node, i) => {
+        {nodes.map((node, i) => {
           const { x, y } = nodePosition(i);
           const done = i < currentIndex;
           const isCurrent = i === currentIndex;

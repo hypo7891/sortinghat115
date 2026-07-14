@@ -3,10 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import { MapScreen } from '../components/MapScreen';
 import { QuestionCard } from '../components/QuestionCard';
 import { ZoneIntro } from '../components/ZoneIntro';
+import { CorridorScene } from '../components/corridor/CorridorScene';
 import { useQuizStore } from '../lib/quizStore';
-import { MAP_ZONES, QUIZ_NODES, TOTAL_QUESTIONS, zoneStartIndex } from '../data/mapZones';
+import {
+  MAP_ZONES,
+  QUIZ_NODES,
+  TOTAL_QUESTIONS,
+  TRIALS_NODES,
+  zoneStartIndex,
+} from '../data/mapZones';
 import { HOUSE_QUESTIONS } from '../data/houseQuestions';
-import { MBTI_QUESTIONS } from '../data/mbtiQuestions';
+import { MBTI_QUESTIONS, type MbtiAxis } from '../data/mbtiQuestions';
 import { scoreHouse } from '../lib/scoring/houseScoring';
 import { scoreMbti } from '../lib/scoring/mbtiScoring';
 import { submitQuizResult } from '../firebase/firestore';
@@ -45,6 +52,7 @@ export function QuizPage() {
     () => new Map(MBTI_QUESTIONS.map((q) => [q.id, q])),
     [],
   );
+  const mbtiLiveResult = useMemo(() => scoreMbti(mbtiAnswers), [mbtiAnswers]);
 
   if (!studentName || !classId) {
     navigate('/', { replace: true });
@@ -108,7 +116,18 @@ export function QuizPage() {
 
   return (
     <div className="relative">
-      <MapScreen currentIndex={currentQuestionIndex} onSelectNode={revisitNode} />
+      {currentNode?.kind === 'mbti' ? (
+        <CorridorScene
+          axisResults={mbtiLiveResult.axisResults}
+          activeAxis={currentNode.zoneId as MbtiAxis}
+        />
+      ) : (
+        <MapScreen
+          nodes={TRIALS_NODES}
+          currentIndex={currentQuestionIndex}
+          onSelectNode={revisitNode}
+        />
+      )}
 
       {needsIntro && currentZone && (
         <ZoneIntro
