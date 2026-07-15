@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { MAP_ZONES, type QuizNode } from '../data/mapZones';
 import courtyardBg from '../assets/courtyard-bg.png';
 
@@ -21,24 +21,17 @@ interface MapScreenProps {
 export function MapScreen({ nodes, currentIndex, onSelectNode }: MapScreenProps) {
   const pathHeight = 60 + (nodes.length - 1) * NODE_SPACING + 80;
   const avatarPos = nodePosition(Math.min(currentIndex, nodes.length - 1));
-  const containerRef = useRef<HTMLDivElement>(null);
 
   const zoneColor = (zoneId: string) =>
     MAP_ZONES.find((z) => z.id === zoneId)?.themeColor ?? '#888';
 
   useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-    const targetTop = avatarPos.y - container.clientHeight / 2;
-    container.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
+    const targetTop = avatarPos.y - window.innerHeight / 2;
+    window.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
   }, [avatarPos.y]);
 
   return (
-    <div
-      ref={containerRef}
-      className="relative mx-auto max-w-md overflow-x-hidden overflow-y-auto px-4 pb-32"
-      style={{ height: '100dvh' }}
-    >
+    <div className="relative mx-auto max-w-md overflow-x-hidden px-4 pb-32">
       <div
         className="fixed inset-0 -z-10"
         style={{

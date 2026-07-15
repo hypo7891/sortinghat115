@@ -35,7 +35,7 @@ export function CorridorScene({ axisResults, activeAxis }: CorridorSceneProps) {
   const ringRadius = 26;
 
   return (
-    <div className="fixed inset-0 -z-10 bg-[#0b0812]">
+    <div className="fixed inset-y-0 left-1/2 -z-10 w-full max-w-md -translate-x-1/2 bg-[#0b0812]">
       <svg
         className="h-full w-full"
         viewBox="0 0 400 700"
