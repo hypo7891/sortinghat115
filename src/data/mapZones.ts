@@ -25,7 +25,7 @@ export const MAP_ZONES: MapZone[] = [
   {
     id: 'EI',
     label: 'E / I 迴廊',
-    intro: '你完成了分類試煉！接下來，測試你的性格傾向——先走進 E / I 迴廊。',
+    intro: '你完成了分類試煉！接下來，測試你的性格傾向，先走進 E / I 迴廊。',
     themeColor: 'var(--color-gryffindor)',
     questionIds: mbtiIdsForAxis('EI'),
   },

@@ -10,12 +10,17 @@
   --color-night: #14101c;
   --color-night-deep: #0b0812;
 
+  /* Neutral brand gold: the one accent for primary actions app-wide
+     (join/sign-in/create), independent of any single house's color. */
+  --color-accent: #f0d78c;
+  --color-accent-ink: #241b12;
+
   --color-gryffindor: #7f1d2b;
   --color-gryffindor-light: #d4a94a;
   --color-ravenclaw: #1f3a63;
   --color-ravenclaw-light: #9aa5c9;
   --color-hufflepuff: #d9a441;
-  --color-hufflepuff-light: #2c2418;
+  --color-hufflepuff-light: #f0d78c;
   --color-slytherin: #1c5c40;
   --color-slytherin-light: #b9c2b0;
 }

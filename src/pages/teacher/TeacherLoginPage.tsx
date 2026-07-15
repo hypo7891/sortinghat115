@@ -35,7 +35,7 @@ export function TeacherLoginPage() {
         type="button"
         onClick={handleSignIn}
         disabled={signingIn}
-        className="rounded-full bg-[var(--color-ravenclaw-light)] px-6 py-2 font-semibold text-[var(--color-ink)] disabled:opacity-60"
+        className="rounded-full bg-[var(--color-accent)] px-6 py-2 font-semibold text-[var(--color-accent-ink)] disabled:opacity-60"
       >
         {signingIn ? '登入中...' : '使用 Google 登入'}
       </button>

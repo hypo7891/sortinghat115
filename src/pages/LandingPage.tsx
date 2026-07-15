@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { resolveJoinCode } from '../firebase/firestore';
 import { useQuizStore } from '../lib/quizStore';
+import courtyardBg from '../assets/courtyard-bg.png';
 
 export function LandingPage() {
   const navigate = useNavigate();
@@ -41,8 +42,17 @@ export function LandingPage() {
   };
 
   return (
-    <div className="flex min-h-dvh flex-col items-center justify-center px-6 text-[var(--color-parchment)]">
-      <div className="w-full max-w-sm">
+    <div className="relative flex min-h-dvh flex-col items-center justify-center px-6 py-12 text-[var(--color-parchment)]">
+      <div
+        className="fixed inset-0 -z-10"
+        style={{
+          backgroundImage: `linear-gradient(to bottom, rgba(11,8,18,0.35), rgba(11,8,18,0.8)), url(${courtyardBg})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center 35%',
+        }}
+      />
+
+      <div className="w-full max-w-sm rounded-2xl border border-[var(--color-parchment)]/15 bg-[var(--color-night-deep)]/55 p-6 shadow-2xl backdrop-blur-sm">
         <h1 className="mb-2 text-center font-serif text-2xl font-bold">
           霍格華茲新生學院傾向測驗
         </h1>
@@ -78,7 +88,7 @@ export function LandingPage() {
           <button
             type="submit"
             disabled={loading}
-            className="mt-2 rounded-full bg-[var(--color-hufflepuff-light)] px-6 py-2 font-semibold text-[var(--color-ink)] disabled:opacity-60"
+            className="mt-2 rounded-full bg-[var(--color-accent)] px-6 py-2 font-semibold text-[var(--color-accent-ink)] disabled:opacity-60"
           >
             {loading ? '確認中...' : '開始測驗'}
           </button>

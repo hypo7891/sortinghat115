@@ -57,7 +57,7 @@ export function TeacherClassesPage() {
         <button
           type="submit"
           disabled={creating || !newClassName.trim()}
-          className="rounded-lg bg-[var(--color-hufflepuff-light)] px-4 py-2 font-semibold text-[var(--color-ink)] disabled:opacity-60"
+          className="rounded-lg bg-[var(--color-accent)] px-4 py-2 font-semibold text-[var(--color-accent-ink)] disabled:opacity-60"
         >
           建立
         </button>

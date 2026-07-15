@@ -72,7 +72,7 @@ export function ResultsPage() {
         <div className="mt-6 flex items-center gap-2 text-sm text-[var(--color-parchment)]/70">
           <HouseBadge house={houseResult.secondaryHouse} size={40} />
           <span>
-            次要學院：{HOUSE_NAMES[houseResult.secondaryHouse]} — {secondaryTrait.keywords}
+            次要學院：{HOUSE_NAMES[houseResult.secondaryHouse]}（{secondaryTrait.keywords}）
           </span>
         </div>
       </motion.div>
