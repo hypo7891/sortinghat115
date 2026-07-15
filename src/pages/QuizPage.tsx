@@ -4,6 +4,7 @@ import { MapScreen } from '../components/MapScreen';
 import { QuestionCard } from '../components/QuestionCard';
 import { ZoneIntro } from '../components/ZoneIntro';
 import { CorridorScene } from '../components/corridor/CorridorScene';
+import { LanternHud } from '../components/corridor/LanternHud';
 import { useQuizStore } from '../lib/quizStore';
 import {
   MAP_ZONES,
@@ -117,10 +118,13 @@ export function QuizPage() {
   return (
     <div className="relative">
       {currentNode?.kind === 'mbti' ? (
-        <CorridorScene
-          axisResults={mbtiLiveResult.axisResults}
-          activeAxis={currentNode.zoneId as MbtiAxis}
-        />
+        <>
+          <CorridorScene />
+          <LanternHud
+            axisResults={mbtiLiveResult.axisResults}
+            activeAxis={currentNode.zoneId as MbtiAxis}
+          />
+        </>
       ) : (
         <MapScreen
           nodes={TRIALS_NODES}

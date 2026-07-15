@@ -1,39 +1,9 @@
-import type { MbtiAxis, MbtiPole } from '../../data/mbtiQuestions';
-import type { MbtiAxisResult } from '../../lib/scoring/mbtiScoring';
 import gargoyleImg from '../../assets/gargoyle.png';
 
-const AXIS_ANGLE: Record<MbtiAxis, number> = {
-  EI: 0,
-  SN: 90,
-  TF: 180,
-  JP: 270,
-};
-
-const AXIS_POLES: Record<MbtiAxis, [MbtiPole, MbtiPole]> = {
-  EI: ['E', 'I'],
-  SN: ['S', 'N'],
-  TF: ['T', 'F'],
-  JP: ['J', 'P'],
-};
-
-const WARM = '#ffb648';
-const COOL = '#6fa8dc';
-const DIM = '#8a7358';
-
-function polarToXY(angleDeg: number, r: number, cx: number, cy: number) {
-  const rad = (angleDeg * Math.PI) / 180;
-  return { x: cx + r * Math.sin(rad), y: cy - r * Math.cos(rad) };
-}
-
-interface CorridorSceneProps {
-  axisResults: Record<MbtiAxis, MbtiAxisResult>;
-  activeAxis: MbtiAxis;
-}
-
-export function CorridorScene({ axisResults, activeAxis }: CorridorSceneProps) {
-  const ringCenter = { x: 200, y: 553 };
-  const ringRadius = 26;
-
+// Static first-person corridor backdrop (walls, vanishing point, gargoyle).
+// The lantern + its light ring live in LanternHud instead, rendered above
+// the QuestionCard's modal backdrop so it stays visible while answering.
+export function CorridorScene() {
   return (
     <div className="fixed inset-y-0 left-1/2 -z-10 w-full max-w-md -translate-x-1/2 bg-[#0b0812]">
       <svg
@@ -55,11 +25,6 @@ export function CorridorScene({ axisResults, activeAxis }: CorridorSceneProps) {
             <stop offset="0%" stopColor="#2a2236" />
             <stop offset="100%" stopColor="#1a1522" />
           </linearGradient>
-          <radialGradient id="corridor-lantern-glow" cx="50%" cy="45%" r="60%">
-            <stop offset="0%" stopColor="#ffe9b0" />
-            <stop offset="70%" stopColor="#c98a3a" />
-            <stop offset="100%" stopColor="#5a3d1a" />
-          </radialGradient>
         </defs>
 
         <rect x="0" y="0" width="400" height="700" fill="#0b0812" />
@@ -93,42 +58,6 @@ export function CorridorScene({ axisResults, activeAxis }: CorridorSceneProps) {
 
         <ellipse cx="302" cy="200" rx="52" ry="12" fill="#000" opacity="0.35" />
         <image href={gargoyleImg} x="245" y="56" width="115" height="144" preserveAspectRatio="xMidYMid meet" />
-
-        <g transform="translate(200,615)">
-          <path d="M-18,90 Q-40,40 -30,-10 L30,-10 Q40,40 18,90 Z" fill="#2a2333" />
-          <path d="M-30,-10 Q0,-28 30,-10" fill="none" stroke="#8a7a52" strokeWidth="6" strokeLinecap="round" />
-          <rect x="-46" y="-95" width="92" height="90" rx="6" fill="#332a24" stroke="#8a7a52" strokeWidth="3" />
-          <path d="M-38,-95 Q0,-120 38,-95" fill="none" stroke="#8a7a52" strokeWidth="5" strokeLinecap="round" />
-          <circle cx="0" cy="-105" r="5" fill="#8a7a52" />
-          <rect x="-36" y="-85" width="72" height="70" rx="4" fill="url(#corridor-lantern-glow)" />
-        </g>
-
-        {(Object.keys(AXIS_ANGLE) as MbtiAxis[]).map((axis) => {
-          const baseAngle = AXIS_ANGLE[axis];
-          const [poleA, poleB] = AXIS_POLES[axis];
-          const result = axisResults[axis];
-          const isActive = axis === activeAxis;
-          const started = result.total > 0;
-
-          return [poleA, poleB].map((pole, i) => {
-            const angle = baseAngle + (i === 0 ? -16 : 16);
-            const { x, y } = polarToXY(angle, ringRadius, ringCenter.x, ringCenter.y);
-            const isWinner = started && result.winner === pole;
-            const color = pole === poleA ? WARM : COOL;
-            const opacity = !started ? 0.3 : isWinner ? 0.5 + 0.5 * result.strength : 0.25;
-
-            return (
-              <circle
-                key={pole}
-                cx={x}
-                cy={y}
-                r={isActive ? 4.5 : 3}
-                fill={started ? color : DIM}
-                opacity={opacity}
-              />
-            );
-          });
-        })}
       </svg>
     </div>
   );
