@@ -36,15 +36,74 @@ function newBall(element: MbtiElement): Ball {
   return { x: WIDTH / 2, y: HEIGHT - 58, vx: 0, vy: 0, radius: 9, element, active: false, trail: [] };
 }
 
+function playCue(startFrequency: number, duration: number, endFrequency = startFrequency) {
+  const AudioContextClass = window.AudioContext ?? (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+  if (!AudioContextClass) return;
+  const audioContext = new AudioContextClass();
+  const oscillator = audioContext.createOscillator();
+  const gain = audioContext.createGain();
+  const now = audioContext.currentTime;
+  oscillator.type = 'sine';
+  oscillator.frequency.setValueAtTime(startFrequency, now);
+  oscillator.frequency.exponentialRampToValueAtTime(Math.max(80, endFrequency), now + duration);
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.exponentialRampToValueAtTime(0.18, now + 0.02);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+  oscillator.connect(gain).connect(audioContext.destination);
+  oscillator.start(now);
+  oscillator.stop(now + duration + 0.02);
+  window.setTimeout(() => void audioContext.close(), (duration + 0.1) * 1000);
+}
+
 export function MagicWeavingGame({ mbtiElements, onGameComplete }: MagicWeavingGameProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const frameRef = useRef<number | undefined>(undefined);
-  const gameRef = useRef({ bubbles: makeBubbles(mbtiElements), particles: [] as Particle[], balls: mbtiElements.slice(0, 4).map(newBall), currentBall: 0, score: 0, destroyed: {} as Record<string, number>, started: false, completed: false, paddleX: WIDTH / 2, lastTime: 0, timerRemaining: GAME_DURATION_SECONDS });
+  const musicRef = useRef<{ context: AudioContext; interval: number; gain: GainNode } | null>(null);
+  const gameRef = useRef({ bubbles: makeBubbles(mbtiElements), particles: [] as Particle[], balls: mbtiElements.slice(0, 4).map(newBall), currentBall: 0, score: 0, destroyed: {} as Record<string, number>, started: false, completed: false, countdown: 0, paddleX: WIDTH / 2, lastTime: 0, wallClock: 0, timerRemaining: GAME_DURATION_SECONDS });
   const [score, setScore] = useState(0);
   const [started, setStarted] = useState(false);
   const [currentBall, setCurrentBall] = useState(0);
   const [, setTimeRemaining] = useState(GAME_DURATION_SECONDS);
   const timerDisplayRef = useRef(GAME_DURATION_SECONDS);
+
+  const stopBackgroundMusic = () => {
+    const music = musicRef.current;
+    if (!music) return;
+    window.clearInterval(music.interval);
+    music.gain.gain.cancelScheduledValues(music.context.currentTime);
+    music.gain.gain.exponentialRampToValueAtTime(0.0001, music.context.currentTime + 0.15);
+    window.setTimeout(() => void music.context.close(), 200);
+    musicRef.current = null;
+  };
+
+  const startBackgroundMusic = () => {
+    if (musicRef.current) return;
+    const AudioContextClass = window.AudioContext ?? (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (!AudioContextClass) return;
+    const context = new AudioContextClass();
+    const gain = context.createGain();
+    gain.gain.value = 0.035;
+    gain.connect(context.destination);
+    const notes = [261.63, 329.63, 392, 523.25, 392, 329.63, 293.66, 392];
+    let step = 0;
+    const playNote = () => {
+      const oscillator = context.createOscillator();
+      const noteGain = context.createGain();
+      const now = context.currentTime;
+      oscillator.type = 'triangle';
+      oscillator.frequency.value = notes[step % notes.length];
+      noteGain.gain.setValueAtTime(0.0001, now);
+      noteGain.gain.exponentialRampToValueAtTime(0.35, now + 0.025);
+      noteGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.34);
+      oscillator.connect(noteGain).connect(gain);
+      oscillator.start(now);
+      oscillator.stop(now + 0.36);
+      step += 1;
+    };
+    playNote();
+    const interval = window.setInterval(playNote, 380);
+    musicRef.current = { context, interval, gain };
+  };
   const [complete, setComplete] = useState(false);
   const [dominant, setDominant] = useState('');
 
@@ -57,8 +116,17 @@ export function MagicWeavingGame({ mbtiElements, onGameComplete }: MagicWeavingG
     const draw = (time: number) => {
       const delta = Math.min((time - game.lastTime) / 16.67 || 1, 2);
       game.lastTime = time;
+      const now = Date.now();
+      if (game.countdown > 0) {
+        context.fillStyle = 'rgba(8, 11, 25, .68)'; context.fillRect(0, 0, WIDTH, HEIGHT);
+        context.fillStyle = '#f1f3ff'; context.font = '900 108px system-ui'; context.textAlign = 'center'; context.textBaseline = 'middle'; context.shadowColor = '#a78bfa'; context.shadowBlur = 34; context.fillText(String(game.countdown), WIDTH / 2, HEIGHT / 2); context.shadowBlur = 0;
+        context.fillStyle = '#aeb5d2'; context.font = '500 12px monospace'; context.fillText('PREPARE YOUR WEAVE', WIDTH / 2, HEIGHT / 2 + 80);
+      }
+
       if (game.started && !game.completed) {
-        game.timerRemaining = Math.max(0, game.timerRemaining - delta / 60);
+        const elapsedSeconds = game.wallClock ? Math.max(0, (now - game.wallClock) / 1000) : 0;
+        game.timerRemaining = Math.max(0, game.timerRemaining - elapsedSeconds);
+        game.wallClock = now;
         const nextTime = Math.ceil(game.timerRemaining);
         if (nextTime !== timerDisplayRef.current) {
           timerDisplayRef.current = nextTime;
@@ -112,16 +180,17 @@ export function MagicWeavingGame({ mbtiElements, onGameComplete }: MagicWeavingG
       const paddleY = HEIGHT - 34; context.shadowColor = '#8b5cf6'; context.shadowBlur = 18; context.fillStyle = '#c4b5fd'; context.beginPath(); context.roundRect(game.paddleX - 58, paddleY - 7, 116, 14, 7); context.fill(); context.shadowBlur = 0; context.fillStyle = 'rgba(255,255,255,.75)'; context.fillRect(game.paddleX - 39, paddleY - 4, 78, 2);
       const ball = game.balls[game.currentBall]; if (ball && !ball.active) { ball.x = game.paddleX; ball.y = HEIGHT - 58; const color = ELEMENTS[ball.element].color; context.shadowColor = color; context.shadowBlur = 20; context.fillStyle = color; context.beginPath(); context.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2); context.fill(); context.shadowBlur = 0; }
       if (ball?.active) ball.trail.forEach((point, index) => { context.globalAlpha = (8 - index) / 42; context.fillStyle = ELEMENTS[ball.element].color; context.beginPath(); context.arc(point.x, point.y, Math.max(2, ball.radius - index), 0, Math.PI * 2); context.fill(); context.globalAlpha = 1; });
-      if (game.started && !game.completed && (game.bubbles.every((bubble) => !bubble.alive) || game.currentBall >= game.balls.length || game.timerRemaining <= 0)) { game.completed = true; const nextDominant = Object.entries(game.destroyed).sort((a, b) => b[1] - a[1])[0]?.[0] || mbtiElements[0] || 'E'; setDominant(nextDominant); setComplete(true); onGameComplete(game.score, nextDominant); }
+      if (game.started && !game.completed && (game.bubbles.every((bubble) => !bubble.alive) || game.currentBall >= game.balls.length || game.timerRemaining <= 0)) { game.completed = true; stopBackgroundMusic(); const nextDominant = Object.entries(game.destroyed).sort((a, b) => b[1] - a[1])[0]?.[0] || mbtiElements[0] || 'E'; setDominant(nextDominant); setComplete(true); onGameComplete(game.score, nextDominant); }
       frameRef.current = requestAnimationFrame(draw);
     };
     frameRef.current = requestAnimationFrame(draw);
-    return () => { if (frameRef.current) cancelAnimationFrame(frameRef.current); };
+    return () => { if (frameRef.current) cancelAnimationFrame(frameRef.current); stopBackgroundMusic(); };
   }, [mbtiElements, onGameComplete]);
 
-  const launch = () => { const game = gameRef.current; if (game.completed || game.timerRemaining <= 0) return; if (!game.started) { game.started = true; setStarted(true); } const ball = game.balls[game.currentBall]; if (!ball || ball.active) return; const angle = (Math.random() * 0.9 - 0.45); ball.vx = Math.sin(angle) * 5.3; ball.vy = -Math.cos(angle) * 5.3; ball.active = true; };
+  const launchBall = () => { const game = gameRef.current; if (game.completed || game.timerRemaining <= 0) return; if (!game.started) { game.started = true; game.wallClock = Date.now(); setStarted(true); startBackgroundMusic(); } const ball = game.balls[game.currentBall]; if (!ball || ball.active) return; const angle = (Math.random() * 0.9 - 0.45); ball.vx = Math.sin(angle) * 5.3; ball.vy = -Math.cos(angle) * 5.3; ball.active = true; };
+  const launch = () => { const game = gameRef.current; if (game.completed || game.timerRemaining <= 0 || game.countdown > 0) return; if (game.started) { launchBall(); return; } game.countdown = 3; playCue(620, 0.16); window.setTimeout(() => { if (game.completed) return; game.countdown = 2; playCue(700, 0.16); }, 1000); window.setTimeout(() => { if (game.completed) return; game.countdown = 1; playCue(780, 0.16); }, 2000); window.setTimeout(() => { if (game.completed) return; game.countdown = 0; playCue(1250, 0.55, 520); launchBall(); }, 3000); };
   const movePaddle = (clientX: number) => { const canvas = canvasRef.current; if (!canvas) return; const bounds = canvas.getBoundingClientRect(); gameRef.current.paddleX = Math.max(60, Math.min(WIDTH - 60, ((clientX - bounds.left) / bounds.width) * WIDTH)); };
-  const restart = () => { gameRef.current = { bubbles: makeBubbles(mbtiElements), particles: [], balls: mbtiElements.slice(0, 4).map(newBall), currentBall: 0, score: 0, destroyed: {}, started: false, completed: false, paddleX: WIDTH / 2, lastTime: 0, timerRemaining: GAME_DURATION_SECONDS }; timerDisplayRef.current = GAME_DURATION_SECONDS; setScore(0); setStarted(false); setCurrentBall(0); setTimeRemaining(GAME_DURATION_SECONDS); setComplete(false); setDominant(''); };
+  const restart = () => { stopBackgroundMusic(); gameRef.current = { bubbles: makeBubbles(mbtiElements), particles: [], balls: mbtiElements.slice(0, 4).map(newBall), currentBall: 0, score: 0, destroyed: {}, started: false, completed: false, countdown: 0, paddleX: WIDTH / 2, lastTime: 0, wallClock: 0, timerRemaining: GAME_DURATION_SECONDS }; timerDisplayRef.current = GAME_DURATION_SECONDS; setScore(0); setStarted(false); setCurrentBall(0); setTimeRemaining(GAME_DURATION_SECONDS); setComplete(false); setDominant(''); };
   useEffect(() => { const handleKey = (event: KeyboardEvent) => { if (event.code === 'Space') { event.preventDefault(); launch(); } }; window.addEventListener('keydown', handleKey); return () => window.removeEventListener('keydown', handleKey); });
   const currentElement = mbtiElements[currentBall] ?? mbtiElements[0] ?? 'E';
   return <main className="magic-weaving-game game-shell"><div className="game-header"><div><span className="eyebrow">ARCANE PRACTICUM / FINAL TRIAL</span><h1>魔法編織 <em>Magic Weaving</em></h1></div><div className="header-mark"><span className="orbit orbit-one" /><span className="orbit orbit-two" /><span>MW</span></div></div><section className="game-layout"><aside className="side-panel"><div className="panel-kicker">CURRENT WEAVE</div><p className="panel-title">你的性格元素</p><div className="element-stack">{mbtiElements.slice(0, 4).map((element, index) => <div className={`element-row ${index === currentBall ? 'is-current' : ''}`} key={`${element}-${index}`}><span className="element-orb" style={{ '--orb-color': ELEMENTS[element].color } as CSSProperties}>{element}</span><span><strong>{ELEMENTS[element].name}</strong><small>{index === currentBall ? '正在施放' : index < currentBall ? '已完成' : '待命'}</small></span><b>{String(index + 1).padStart(2, '0')}</b></div>)}</div><div className="side-note">同色元素擊中泡泡時，法術會產生共鳴並獲得分數。</div></aside><div className="arena-wrap"><div className="arena-top"><div><span className="stat-label">SCORE</span><strong>{String(score).padStart(4, '0')}</strong></div><div className="arena-instruction">{complete ? '試煉完成' : started ? '移動光板，維持法術連鎖' : '點擊畫布或按下空白鍵開始'}</div><div className="lives"><span className="stat-label">SPELLS</span>{mbtiElements.slice(0, 4).map((element, index) => <span className={`life-orb ${index < currentBall ? 'used' : ''}`} style={{ '--orb-color': ELEMENTS[element].color } as CSSProperties} key={`${element}-life-${index}`}>{element}</span>)}</div></div><div className="canvas-frame"><canvas ref={canvasRef} width={WIDTH} height={HEIGHT} onClick={launch} onMouseMove={(event) => movePaddle(event.clientX)} onTouchMove={(event) => movePaddle(event.touches[0].clientX)} aria-label="魔法泡泡消除遊戲" /></div><div className="game-controls"><span>DRAG TO WEAVE</span><span className="control-key">SPACE</span><span>LAUNCH</span></div>{complete && <div className="result-card"><span className="result-eyebrow">TRIAL COMPLETE</span><h2>共鳴完成</h2><p>你與 <b style={{ color: ELEMENTS[dominant as MbtiElement]?.color }}>{dominant} · {ELEMENTS[dominant as MbtiElement]?.name}</b> 元素產生最深連結。</p><strong>{score}<small> POINTS</small></strong><button onClick={restart}>再次編織</button></div>}</div></section><footer className="spell-footer"><span>ELEMENTAL SPELL PACK</span><div className="spell-list">{mbtiElements.slice(0, 4).map((element, index) => <div className={`spell-chip ${index === currentBall ? 'next' : ''}`} key={`${element}-chip-${index}`}><i style={{ backgroundColor: ELEMENTS[element].color }} />{ELEMENTS[element].name}<b>{element}</b></div>)}</div><span className="next-label">NEXT: {currentElement}</span></footer></main>;
