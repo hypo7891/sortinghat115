@@ -20,6 +20,11 @@ firestore-debug.log
 ui-debug.log
 pubsub-debug.log
 
+# Local Claude Code skill tooling (npx skills add) — not part of the app
+.agents
+.claude/skills
+skills-lock.json
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
