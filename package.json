@@ -34,6 +34,7 @@
     "firebase-tools": "^15.23.0",
     "jsdom": "^29.1.1",
     "oxlint": "^1.71.0",
+    "sharp": "^0.35.3",
     "typescript": "~6.0.2",
     "vite": "^8.1.1",
     "vitest": "^4.1.10"

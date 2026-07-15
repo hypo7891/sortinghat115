@@ -1,5 +1,6 @@
 import type { MbtiAxis, MbtiPole } from '../../data/mbtiQuestions';
 import type { MbtiAxisResult } from '../../lib/scoring/mbtiScoring';
+import gargoyleImg from '../../assets/gargoyle.png';
 
 const AXIS_ANGLE: Record<MbtiAxis, number> = {
   EI: 0,
@@ -90,19 +91,8 @@ export function CorridorScene({ axisResults, activeAxis }: CorridorSceneProps) {
           opacity="0.7"
         />
 
-        <g transform="translate(305,155) scale(0.6)">
-          <ellipse cx="0" cy="60" rx="46" ry="14" fill="#000" opacity="0.35" />
-          <path
-            d="M-30,10 Q-45,-25 -15,-45 Q0,-58 15,-45 Q45,-25 30,10 Q30,45 0,55 Q-30,45 -30,10 Z"
-            fill="#463a4e"
-          />
-          <path d="M-30,-10 L-58,-35 L-32,-18 Z" fill="#3a2f42" />
-          <path d="M30,-10 L58,-35 L32,-18 Z" fill="#3a2f42" />
-          <path d="M-14,-46 L-8,-64 L-2,-46 Z" fill="#463a4e" />
-          <path d="M14,-46 L8,-64 L2,-46 Z" fill="#463a4e" />
-          <circle cx="-10" cy="-18" r="4" fill="#f2b84a" />
-          <circle cx="10" cy="-18" r="4" fill="#f2b84a" />
-        </g>
+        <ellipse cx="302" cy="200" rx="52" ry="12" fill="#000" opacity="0.35" />
+        <image href={gargoyleImg} x="245" y="56" width="115" height="144" preserveAspectRatio="xMidYMid meet" />
 
         <g transform="translate(200,615)">
           <path d="M-18,90 Q-40,40 -30,-10 L30,-10 Q40,40 18,90 Z" fill="#2a2333" />
