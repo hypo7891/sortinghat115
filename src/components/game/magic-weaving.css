@@ -1,0 +1,68 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+
+.magic-weaving-game { font-family: 'Noto Sans TC', system-ui, sans-serif; color: #e8eaf4; background: radial-gradient(circle at 72% 9%, #1c2142 0, #080b19 43%); font-synthesis: none; }
+.magic-weaving-game * { box-sizing: border-box; }
+.magic-weaving-game button, .magic-weaving-game canvas { font: inherit; }
+.magic-weaving-game.game-shell { min-height: 100dvh; width: min(1440px, 100%); margin: auto; padding: 44px clamp(18px, 5vw, 78px) 38px; }
+.magic-weaving-game .game-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 34px; }
+.magic-weaving-game .eyebrow, .magic-weaving-game .panel-kicker, .magic-weaving-game .stat-label, .magic-weaving-game .game-controls, .magic-weaving-game .spell-footer > span { color: #8e95b7; font: 500 10px 'DM Mono', monospace; letter-spacing: .18em; }
+.magic-weaving-game h1 { font-size: clamp(28px, 3.5vw, 52px); line-height: 1; letter-spacing: -.06em; margin: 12px 0 0; font-weight: 900; }
+.magic-weaving-game h1 em { color: #aeb5d2; font: 400 italic clamp(16px, 2vw, 25px) Georgia, serif; letter-spacing: -.04em; margin-left: 10px; }
+.magic-weaving-game .header-mark { position: relative; display: grid; place-items: center; width: 58px; height: 58px; border: 1px solid #5b6389; border-radius: 50%; color: #d6d9ef; font: 500 11px 'DM Mono', monospace; letter-spacing: .1em; }
+.magic-weaving-game .orbit { position: absolute; border: 1px solid #6e78aa; border-radius: 50%; transform: rotate(30deg); opacity: .7; }
+.magic-weaving-game .orbit-one { width: 78px; height: 29px; }
+.magic-weaving-game .orbit-two { width: 29px; height: 78px; transform: rotate(-35deg); }
+.magic-weaving-game .game-layout { display: grid; grid-template-columns: 190px minmax(0, 800px); gap: clamp(18px, 4vw, 68px); justify-content: center; align-items: start; }
+.magic-weaving-game .side-panel { padding-top: 30px; }
+.magic-weaving-game .panel-title { margin: 10px 0 25px; color: #c7cbe0; font-size: 14px; }
+.magic-weaving-game .element-stack { display: grid; gap: 10px; }
+.magic-weaving-game .element-row { display: grid; grid-template-columns: 31px 1fr auto; align-items: center; gap: 10px; padding: 7px 0; color: #a1a8c2; opacity: .67; }
+.magic-weaving-game .element-row.is-current { opacity: 1; color: #eff1fb; }
+.magic-weaving-game .element-orb, .magic-weaving-game .life-orb { display: grid; place-items: center; border: 1px solid var(--orb-color); color: var(--orb-color); border-radius: 50%; font: 500 11px 'DM Mono', monospace; }
+.magic-weaving-game .element-orb { width: 29px; height: 29px; box-shadow: 0 0 16px color-mix(in srgb, var(--orb-color), transparent 55%); }
+.magic-weaving-game .element-row strong, .magic-weaving-game .element-row small { display: block; }
+.magic-weaving-game .element-row strong { font-size: 12px; font-weight: 500; }
+.magic-weaving-game .element-row small { margin-top: 2px; font: 9px 'DM Mono', monospace; color: #737b9e; }
+.magic-weaving-game .element-row b { color: #626a8a; font: 10px 'DM Mono', monospace; }
+.magic-weaving-game .side-note { margin-top: 42px; padding-top: 16px; border-top: 1px solid #2a3154; color: #747c9e; font-size: 11px; line-height: 1.8; }
+.magic-weaving-game .arena-wrap { position: relative; min-width: 0; }
+.magic-weaving-game .arena-top { display: flex; align-items: end; justify-content: space-between; min-height: 47px; padding: 0 2px 12px; }
+.magic-weaving-game .arena-top strong { display: block; margin-top: 3px; color: #f0f1f8; font: 500 28px 'DM Mono', monospace; letter-spacing: -.08em; }
+.magic-weaving-game .arena-instruction { align-self: center; color: #7f87a9; font-size: 11px; }
+.magic-weaving-game .lives { display: flex; gap: 7px; align-items: center; }
+.magic-weaving-game .life-orb { width: 20px; height: 20px; font-size: 8px; }
+.magic-weaving-game .life-orb.used { opacity: .2; filter: grayscale(1); }
+.magic-weaving-game .canvas-frame { overflow: hidden; border: 1px solid #323b66; box-shadow: 0 22px 90px rgba(30, 37, 86, .3); cursor: crosshair; }
+.magic-weaving-game .canvas-frame canvas { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; }
+.magic-weaving-game .game-controls { display: flex; gap: 13px; align-items: center; justify-content: center; padding-top: 13px; font-size: 9px; }
+.magic-weaving-game .control-key { color: #d9dcf0; border: 1px solid #565e85; padding: 3px 7px; border-radius: 3px; }
+.magic-weaving-game .spell-footer { display: flex; align-items: center; gap: 18px; max-width: 1058px; margin: 38px auto 0; padding-top: 19px; border-top: 1px solid #252c4b; }
+.magic-weaving-game .spell-list { display: flex; gap: 8px; flex-wrap: wrap; }
+.magic-weaving-game .spell-chip { display: flex; align-items: center; gap: 8px; padding: 7px 11px; border: 1px solid #293052; color: #8c94b5; font-size: 11px; }
+.magic-weaving-game .spell-chip.next { border-color: #727ba8; color: #ebedf8; }
+.magic-weaving-game .spell-chip i { width: 6px; height: 6px; border-radius: 50%; box-shadow: 0 0 8px currentColor; }
+.magic-weaving-game .spell-chip b { color: #5f6789; font: 10px 'DM Mono', monospace; }
+.magic-weaving-game .next-label { margin-left: auto; color: #737b9b !important; white-space: nowrap; }
+.magic-weaving-game .result-card { position: absolute; inset: 47px 0 40px; display: grid; place-items: center; align-content: center; gap: 10px; text-align: center; background: rgba(9, 13, 32, .88); backdrop-filter: blur(8px); animation: magic-weaving-reveal .5s ease both; }
+.magic-weaving-game .result-eyebrow { color: #aab2dc; font: 10px 'DM Mono', monospace; letter-spacing: .2em; }
+.magic-weaving-game .result-card h2 { margin: 3px 0 0; font-size: 30px; }
+.magic-weaving-game .result-card p { margin: 0; color: #9299b7; font-size: 12px; }
+.magic-weaving-game .result-card > strong { margin: 10px 0; color: #f5f6ff; font: 500 40px 'DM Mono', monospace; }
+.magic-weaving-game .result-card > strong small { color: #9299b7; font-size: 10px; }
+.magic-weaving-game .result-card button { padding: 10px 22px; border: 1px solid #aeb6e0; background: transparent; color: #f2f3fb; cursor: pointer; font-size: 12px; transition: background .2s, color .2s; }
+.magic-weaving-game .result-card button:hover { background: #e6e8fa; color: #11162b; }
+@keyframes magic-weaving-reveal { from { opacity: 0; transform: scale(.98); } to { opacity: 1; transform: scale(1); } }
+@media (max-width: 800px) {
+  .magic-weaving-game.game-shell { padding-top: 26px; }
+  .magic-weaving-game .game-header { margin-bottom: 24px; }
+  .magic-weaving-game .game-layout { grid-template-columns: 1fr; }
+  .magic-weaving-game .side-panel { display: none; }
+  .magic-weaving-game .arena-top { flex-wrap: wrap; gap: 10px; }
+  .magic-weaving-game .arena-instruction { order: 3; width: 100%; text-align: center; }
+  .magic-weaving-game .spell-footer { display: block; }
+  .magic-weaving-game .spell-list { margin-top: 14px; }
+  .magic-weaving-game .next-label { display: block; margin: 14px 0 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .magic-weaving-game *, .magic-weaving-game *::before, .magic-weaving-game *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}

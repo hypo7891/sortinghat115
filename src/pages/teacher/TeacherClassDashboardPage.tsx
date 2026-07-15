@@ -164,6 +164,11 @@ export function TeacherClassDashboardPage() {
                 {HOUSE_NAMES[s.primaryHouse]}
               </span>
               <span className="rounded-full bg-white/10 px-2 py-1 text-xs">{s.mbtiType}</span>
+              {typeof s.gameScore === 'number' && (
+                <span className="rounded-full bg-white/10 px-2 py-1 text-xs text-[var(--color-parchment)]/70">
+                  魔法編織 {s.gameScore}
+                </span>
+              )}
             </div>
           ))}
           {submissions.length === 0 && (

@@ -39,6 +39,8 @@ export interface SubmissionDoc {
   mbtiType: string;
   mbtiAxisScores: Record<MbtiAxis, Record<MbtiPole, number>>;
   mbtiAxisStrength: Record<MbtiAxis, number>;
+  gameScore: number;
+  gameDominantElement: string;
 }
 
 function randomJoinCode(): string {

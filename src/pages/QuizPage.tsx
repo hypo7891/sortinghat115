@@ -5,6 +5,7 @@ import { QuestionCard } from '../components/QuestionCard';
 import { ZoneIntro } from '../components/ZoneIntro';
 import { CorridorScene } from '../components/corridor/CorridorScene';
 import { LanternHud } from '../components/corridor/LanternHud';
+import { MagicWeavingGame, type MbtiElement } from '../components/game/MagicWeavingGame';
 import { useQuizStore } from '../lib/quizStore';
 import {
   MAP_ZONES,
@@ -15,8 +16,8 @@ import {
 } from '../data/mapZones';
 import { HOUSE_QUESTIONS } from '../data/houseQuestions';
 import { MBTI_QUESTIONS, type MbtiAxis } from '../data/mbtiQuestions';
-import { scoreHouse } from '../lib/scoring/houseScoring';
-import { scoreMbti } from '../lib/scoring/mbtiScoring';
+import { scoreHouse, type HouseScoreResult } from '../lib/scoring/houseScoring';
+import { scoreMbti, type MbtiScoreResult } from '../lib/scoring/mbtiScoring';
 import { submitQuizResult } from '../firebase/firestore';
 
 export function QuizPage() {
@@ -34,6 +35,12 @@ export function QuizPage() {
 
   const [introShown, setIntroShown] = useState<Set<string>>(new Set());
   const [submitting, setSubmitting] = useState(false);
+  const [pendingResult, setPendingResult] = useState<{
+    houseAnswers: typeof houseAnswers;
+    mbtiAnswers: typeof mbtiAnswers;
+    houseResult: HouseScoreResult;
+    mbtiResult: MbtiScoreResult;
+  } | null>(null);
 
   const currentNode = QUIZ_NODES[currentQuestionIndex];
   const currentZone = currentNode
@@ -60,11 +67,10 @@ export function QuizPage() {
     return null;
   }
 
-  const handleAnswer = async (letter: string) => {
+  const handleAnswer = (letter: string) => {
     answerCurrent(letter as 'A' | 'B' | 'C' | 'D');
 
     if (currentQuestionIndex + 1 >= TOTAL_QUESTIONS) {
-      setSubmitting(true);
       const finalHouseAnswers =
         currentNode.kind === 'house'
           ? { ...houseAnswers, [currentNode.questionId]: letter as 'A' | 'B' | 'C' | 'D' }
@@ -77,40 +83,62 @@ export function QuizPage() {
       const houseResult = scoreHouse(finalHouseAnswers);
       const mbtiResult = scoreMbti(finalMbtiAnswers);
 
-      const mbtiAxisScores = Object.fromEntries(
-        Object.entries(mbtiResult.axisResults).map(([axis, r]) => [axis, r.counts]),
-      );
-      const mbtiAxisStrength = Object.fromEntries(
-        Object.entries(mbtiResult.axisResults).map(([axis, r]) => [axis, r.strength]),
-      );
-
-      await submitQuizResult(classId, {
-        studentDisplayName: studentName,
-        startedAt: startedAt ?? Date.now(),
+      setPendingResult({
         houseAnswers: finalHouseAnswers,
         mbtiAnswers: finalMbtiAnswers,
-        houseScores: houseResult.scores,
-        primaryHouse: houseResult.primaryHouse,
-        secondaryHouse: houseResult.secondaryHouse,
-        houseTie: houseResult.houseTie,
-        mbtiType: mbtiResult.mbtiType,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        mbtiAxisScores: mbtiAxisScores as any,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        mbtiAxisStrength: mbtiAxisStrength as any,
-      });
-
-      navigate('/results', {
-        replace: true,
-        state: { houseResult, mbtiResult },
+        houseResult,
+        mbtiResult,
       });
     }
   };
 
-  if (submitting) {
+  const handleGameComplete = async (gameScore: number, gameDominantElement: string) => {
+    if (!pendingResult || !classId) return;
+    setSubmitting(true);
+    const { houseAnswers: finalHouseAnswers, mbtiAnswers: finalMbtiAnswers, houseResult, mbtiResult } =
+      pendingResult;
+
+    const mbtiAxisScores = Object.fromEntries(
+      Object.entries(mbtiResult.axisResults).map(([axis, r]) => [axis, r.counts]),
+    );
+    const mbtiAxisStrength = Object.fromEntries(
+      Object.entries(mbtiResult.axisResults).map(([axis, r]) => [axis, r.strength]),
+    );
+
+    await submitQuizResult(classId, {
+      studentDisplayName: studentName,
+      startedAt: startedAt ?? Date.now(),
+      houseAnswers: finalHouseAnswers,
+      mbtiAnswers: finalMbtiAnswers,
+      houseScores: houseResult.scores,
+      primaryHouse: houseResult.primaryHouse,
+      secondaryHouse: houseResult.secondaryHouse,
+      houseTie: houseResult.houseTie,
+      mbtiType: mbtiResult.mbtiType,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      mbtiAxisScores: mbtiAxisScores as any,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      mbtiAxisStrength: mbtiAxisStrength as any,
+      gameScore,
+      gameDominantElement,
+    });
+
+    navigate('/results', {
+      replace: true,
+      state: { houseResult, mbtiResult, gameScore, gameDominantElement },
+    });
+  };
+
+  if (pendingResult) {
+    const mbtiElements = pendingResult.mbtiResult.mbtiType.split('') as MbtiElement[];
     return (
-      <div className="flex h-dvh items-center justify-center text-center text-[var(--color-parchment)]">
-        <p>分類帽正在思考...</p>
+      <div className="min-h-dvh bg-[#080b19]">
+        <MagicWeavingGame mbtiElements={mbtiElements} onGameComplete={handleGameComplete} />
+        {submitting && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 text-center text-[var(--color-parchment)]">
+            <p>分類帽正在思考...</p>
+          </div>
+        )}
       </div>
     );
   }

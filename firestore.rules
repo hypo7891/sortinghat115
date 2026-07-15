@@ -12,7 +12,8 @@ service cloud.firestore {
           'studentDisplayName', 'startedAt', 'completedAt',
           'houseAnswers', 'mbtiAnswers', 'houseScores',
           'primaryHouse', 'secondaryHouse', 'houseTie',
-          'mbtiType', 'mbtiAxisScores', 'mbtiAxisStrength'
+          'mbtiType', 'mbtiAxisScores', 'mbtiAxisStrength',
+          'gameScore', 'gameDominantElement'
         ])
         && data.studentDisplayName is string
         && data.studentDisplayName.size() > 0
@@ -22,7 +23,9 @@ service cloud.firestore {
         && data.primaryHouse in ['gryffindor', 'ravenclaw', 'hufflepuff', 'slytherin']
         && data.secondaryHouse in ['gryffindor', 'ravenclaw', 'hufflepuff', 'slytherin']
         && data.mbtiType is string
-        && data.mbtiType.size() == 4;
+        && data.mbtiType.size() == 4
+        && data.gameScore is int
+        && data.gameDominantElement is string;
     }
 
     match /teachers/{teacherId} {

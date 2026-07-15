@@ -12,6 +12,8 @@ import { PageCard } from '../components/ui/PageCard';
 interface ResultsLocationState {
   houseResult: HouseScoreResult;
   mbtiResult: MbtiScoreResult;
+  gameScore?: number;
+  gameDominantElement?: string;
 }
 
 const AXIS_LABELS: Record<string, string> = {
@@ -44,7 +46,7 @@ export function ResultsPage() {
     );
   }
 
-  const { houseResult, mbtiResult } = state;
+  const { houseResult, mbtiResult, gameScore, gameDominantElement } = state;
   const primaryTrait = HOUSE_TRAITS[houseResult.primaryHouse];
   const secondaryTrait = HOUSE_TRAITS[houseResult.secondaryHouse];
 
@@ -134,6 +136,21 @@ export function ResultsPage() {
             })}
           </div>
         </section>
+
+        {typeof gameScore === 'number' && (
+          <section className="mt-10">
+            <h2 className="mb-3 font-serif text-lg font-semibold">魔法編織試煉</h2>
+            <div className="flex items-center justify-between rounded-xl border border-[var(--color-parchment)]/15 bg-white/5 px-4 py-3 text-sm">
+              <span>共鳴分數</span>
+              <span className="font-semibold">{gameScore}</span>
+            </div>
+            {gameDominantElement && (
+              <p className="mt-2 text-xs text-[var(--color-parchment)]/60">
+                本次施放中，與 {gameDominantElement} 元素產生最深連結。
+              </p>
+            )}
+          </section>
+        )}
 
         <section className="mt-10 text-sm leading-relaxed text-[var(--color-parchment)]/80">
           {SORTING_DECLARATION.map((line) => (
