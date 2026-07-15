@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { signInTeacher } from '../../firebase/auth';
 import { useTeacherAuth } from '../../hooks/useTeacherAuth';
+import { PageCard } from '../../components/ui/PageCard';
 
 export function TeacherLoginPage() {
   const navigate = useNavigate();
@@ -26,20 +27,22 @@ export function TeacherLoginPage() {
   };
 
   return (
-    <div className="flex min-h-dvh flex-col items-center justify-center gap-6 px-6 text-center text-[var(--color-parchment)]">
-      <h1 className="font-serif text-2xl font-bold">老師登入</h1>
-      <p className="max-w-xs text-sm text-[var(--color-parchment)]/70">
-        登入後可以建立班級、取得加入代碼，並查看學生的測驗結果總覽。
-      </p>
-      <button
-        type="button"
-        onClick={handleSignIn}
-        disabled={signingIn}
-        className="rounded-full bg-[var(--color-accent)] px-6 py-2 font-semibold text-[var(--color-accent-ink)] disabled:opacity-60"
-      >
-        {signingIn ? '登入中...' : '使用 Google 登入'}
-      </button>
-      {error && <p className="text-sm text-red-300">{error}</p>}
+    <div className="flex min-h-dvh flex-col items-center justify-center px-6 text-[var(--color-parchment)]">
+      <PageCard className="flex w-full max-w-sm flex-col items-center gap-6 text-center">
+        <h1 className="font-serif text-2xl font-bold">老師登入</h1>
+        <p className="max-w-xs text-sm text-[var(--color-parchment)]/70">
+          登入後可以建立班級、取得加入代碼，並查看學生的測驗結果總覽。
+        </p>
+        <button
+          type="button"
+          onClick={handleSignIn}
+          disabled={signingIn}
+          className="rounded-full bg-[var(--color-accent)] px-6 py-2 font-semibold text-[var(--color-accent-ink)] disabled:opacity-60"
+        >
+          {signingIn ? '登入中...' : '使用 Google 登入'}
+        </button>
+        {error && <p className="text-sm text-red-300">{error}</p>}
+      </PageCard>
     </div>
   );
 }

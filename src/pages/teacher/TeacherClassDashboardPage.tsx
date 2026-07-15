@@ -18,6 +18,7 @@ import {
 } from '../../firebase/firestore';
 import { HouseBadge } from '../../components/badges/HouseBadge';
 import { HOUSE_NAMES, HOUSE_ORDER } from '../../data/houseTypes';
+import { PageCard } from '../../components/ui/PageCard';
 
 const AXIS_POLES: [string, string][] = [
   ['E', 'I'],
@@ -95,6 +96,7 @@ export function TeacherClassDashboardPage() {
         ← 回到班級列表
       </button>
 
+      <PageCard>
       <div className="mb-8 flex items-center justify-between">
         <h1 className="font-serif text-2xl font-bold">{klass?.className ?? '載入中...'}</h1>
         {klass && (
@@ -171,6 +173,7 @@ export function TeacherClassDashboardPage() {
           )}
         </div>
       </section>
+      </PageCard>
     </div>
   );
 }

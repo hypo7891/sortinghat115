@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { resolveJoinCode } from '../firebase/firestore';
 import { useQuizStore } from '../lib/quizStore';
+import { PageCard } from '../components/ui/PageCard';
 import courtyardBg from '../assets/courtyard-bg.png';
 
 export function LandingPage() {
@@ -52,7 +53,7 @@ export function LandingPage() {
         }}
       />
 
-      <div className="w-full max-w-sm rounded-2xl border border-[var(--color-parchment)]/15 bg-[var(--color-night-deep)]/55 p-6 shadow-2xl backdrop-blur-sm">
+      <PageCard className="w-full max-w-sm">
         <h1 className="mb-2 text-center font-serif text-2xl font-bold">
           霍格華茲新生學院傾向測驗
         </h1>
@@ -104,7 +105,7 @@ export function LandingPage() {
             前往老師登入
           </button>
         </p>
-      </div>
+      </PageCard>
     </div>
   );
 }
