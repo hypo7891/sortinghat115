@@ -20,6 +20,7 @@ import type { MbtiAxis, MbtiPole } from '../data/mbtiQuestions';
 export interface ClassDoc {
   id: string;
   teacherUid: string;
+  teacherEmail?: string;
   className: string;
   joinCode: string;
   createdAt: Timestamp | null;
@@ -55,12 +56,14 @@ function randomJoinCode(): string {
 export async function createClass(
   teacherUid: string,
   className: string,
+  teacherEmail?: string,
 ): Promise<{ classId: string; joinCode: string }> {
   const joinCode = randomJoinCode();
   const classRef = doc(collection(db, 'classes'));
 
   await setDoc(classRef, {
     teacherUid,
+    teacherEmail: teacherEmail ?? '',
     className,
     joinCode,
     createdAt: serverTimestamp(),
@@ -100,6 +103,18 @@ export function subscribeTeacherClasses(
 ) {
   const q = query(collection(db, 'classes'), where('teacherUid', '==', teacherUid));
   return onSnapshot(q, (snap) => {
+    callback(
+      snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<ClassDoc, 'id'>) })),
+    );
+  });
+}
+
+// Admin-only: every class across every teacher. Only the hardcoded admin
+// account passes the matching Firestore rule (see isAdmin() in
+// firestore.rules) — calling this as a non-admin will fail with
+// permission-denied.
+export function subscribeAllClasses(callback: (classes: ClassDoc[]) => void) {
+  return onSnapshot(collection(db, 'classes'), (snap) => {
     callback(
       snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<ClassDoc, 'id'>) })),
     );

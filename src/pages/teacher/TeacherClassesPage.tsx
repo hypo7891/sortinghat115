@@ -1,13 +1,20 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTeacherAuth } from '../../hooks/useTeacherAuth';
-import { createClass, subscribeTeacherClasses, type ClassDoc } from '../../firebase/firestore';
+import {
+  createClass,
+  subscribeAllClasses,
+  subscribeTeacherClasses,
+  type ClassDoc,
+} from '../../firebase/firestore';
 import { signOutTeacher } from '../../firebase/auth';
 import { PageCard } from '../../components/ui/PageCard';
+import { ADMIN_EMAILS } from '../../lib/admin';
 
 export function TeacherClassesPage() {
   const navigate = useNavigate();
   const { user, loading } = useTeacherAuth();
+  const isAdmin = !!user?.email && ADMIN_EMAILS.includes(user.email);
   const [classes, setClasses] = useState<ClassDoc[]>([]);
   const [newClassName, setNewClassName] = useState('');
   const [creating, setCreating] = useState(false);
@@ -18,15 +25,17 @@ export function TeacherClassesPage() {
 
   useEffect(() => {
     if (!user) return;
-    return subscribeTeacherClasses(user.uid, setClasses);
-  }, [user]);
+    return isAdmin
+      ? subscribeAllClasses(setClasses)
+      : subscribeTeacherClasses(user.uid, setClasses);
+  }, [user, isAdmin]);
 
   const handleCreate = async (e: FormEvent) => {
     e.preventDefault();
     if (!user || !newClassName.trim()) return;
     setCreating(true);
     try {
-      await createClass(user.uid, newClassName.trim());
+      await createClass(user.uid, newClassName.trim(), user.email ?? '');
       setNewClassName('');
     } finally {
       setCreating(false);
@@ -39,7 +48,7 @@ export function TeacherClassesPage() {
     <div className="mx-auto max-w-lg px-6 py-10 text-[var(--color-parchment)]">
       <PageCard>
         <div className="mb-8 flex items-center justify-between">
-          <h1 className="font-serif text-2xl font-bold">我的班級</h1>
+          <h1 className="font-serif text-2xl font-bold">{isAdmin ? '所有班級（管理員）' : '我的班級'}</h1>
           <button
             type="button"
             onClick={() => signOutTeacher()}
@@ -78,7 +87,12 @@ export function TeacherClassesPage() {
               onClick={() => navigate(`/teacher/classes/${c.id}`)}
               className="flex items-center justify-between rounded-xl border border-[var(--color-parchment)]/20 bg-white/5 px-4 py-3 text-left hover:bg-white/10"
             >
-              <span className="font-medium">{c.className}</span>
+              <span className="flex flex-col">
+                <span className="font-medium">{c.className}</span>
+                {isAdmin && c.teacherEmail && (
+                  <span className="text-xs text-[var(--color-parchment)]/50">{c.teacherEmail}</span>
+                )}
+              </span>
               <span className="rounded-full bg-white/10 px-3 py-1 text-xs tracking-widest">
                 {c.joinCode}
               </span>

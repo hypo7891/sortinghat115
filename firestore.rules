@@ -7,6 +7,16 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    // Hardcoded admin accounts that can read every class/submission
+    // regardless of ownership. Adding an admin means adding another email
+    // here (and redeploying rules).
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.email in [
+        'chiashen@tmail.hc.edu.tw',
+        'j27271@tmail.ilc.edu.tw'
+      ];
+    }
+
     function isValidSubmission(data) {
       return data.keys().hasAll([
           'studentDisplayName', 'startedAt', 'completedAt',
@@ -41,13 +51,15 @@ service cloud.firestore {
     }
 
     match /classes/{classId} {
-      allow read, update, delete: if isSignedIn() && resource.data.teacherUid == request.auth.uid;
+      allow read: if isAdmin() || (isSignedIn() && resource.data.teacherUid == request.auth.uid);
+      allow update, delete: if isSignedIn() && resource.data.teacherUid == request.auth.uid;
       allow create: if isSignedIn() && request.resource.data.teacherUid == request.auth.uid;
 
       match /submissions/{submissionId} {
         allow create: if isValidSubmission(request.resource.data);
-        allow read: if isSignedIn()
-          && get(/databases/$(database)/documents/classes/$(classId)).data.teacherUid == request.auth.uid;
+        allow read: if isAdmin()
+          || (isSignedIn()
+              && get(/databases/$(database)/documents/classes/$(classId)).data.teacherUid == request.auth.uid);
         allow update, delete: if false;
       }
     }
