@@ -121,7 +121,7 @@ export function TeacherClassDashboardPage() {
               <Tooltip
                 contentStyle={{ background: '#14101c', border: 'none', color: '#f3ead9' }}
               />
-              <Bar dataKey="人數" fill="var(--color-hufflepuff-light)" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="人數" fill="var(--color-patience-light)" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -141,7 +141,7 @@ export function TeacherClassDashboardPage() {
                     <Tooltip
                       contentStyle={{ background: '#14101c', border: 'none', color: '#f3ead9' }}
                     />
-                    <Bar dataKey="人數" fill="var(--color-ravenclaw-light)" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="人數" fill="var(--color-wisdom-light)" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>

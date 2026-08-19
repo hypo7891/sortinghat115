@@ -20,8 +20,8 @@ service cloud.firestore {
         && data.studentDisplayName.size() <= 40
         && data.houseAnswers.size() == 12
         && data.mbtiAnswers.size() == 23
-        && data.primaryHouse in ['gryffindor', 'ravenclaw', 'hufflepuff', 'slytherin']
-        && data.secondaryHouse in ['gryffindor', 'ravenclaw', 'hufflepuff', 'slytherin']
+        && data.primaryHouse in ['courage', 'wisdom', 'patience', 'composure']
+        && data.secondaryHouse in ['courage', 'wisdom', 'patience', 'composure']
         && data.mbtiType is string
         && data.mbtiType.size() == 4
         && data.gameScore is int

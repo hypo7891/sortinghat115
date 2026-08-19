@@ -55,10 +55,10 @@ export function LandingPage() {
 
       <PageCard className="w-full max-w-sm">
         <h1 className="mb-2 text-center font-serif text-2xl font-bold">
-          霍格華茲新生學院傾向測驗
+          新希望學院新生特質傾向測驗
         </h1>
         <p className="mb-8 text-center text-sm text-[var(--color-parchment)]/70">
-          歡迎來到霍格華茲！這份測驗沒有標準答案，請選擇最接近你平常想法的答案。
+          歡迎來到新希望學院！這份測驗沒有標準答案，請選擇最接近你平常想法的答案。
         </p>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">

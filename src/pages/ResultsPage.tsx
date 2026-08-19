@@ -93,7 +93,7 @@ export function ResultsPage() {
                   <span className="w-20 shrink-0">{HOUSE_NAMES[house]}</span>
                   <div className="h-2 flex-1 overflow-hidden rounded-full bg-white/10">
                     <div
-                      className="h-full rounded-full bg-[var(--color-hufflepuff-light)]"
+                      className="h-full rounded-full bg-[var(--color-patience-light)]"
                       style={{ width: `${(score / 12) * 100}%` }}
                     />
                   </div>
@@ -124,7 +124,7 @@ export function ResultsPage() {
                   </div>
                   <div className="h-2 overflow-hidden rounded-full bg-white/10">
                     <div
-                      className="h-full rounded-full bg-[var(--color-ravenclaw-light)]"
+                      className="h-full rounded-full bg-[var(--color-wisdom-light)]"
                       style={{ width: `${r.strength * 100}%` }}
                     />
                   </div>

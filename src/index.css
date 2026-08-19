@@ -15,14 +15,14 @@
   --color-accent: #f0d78c;
   --color-accent-ink: #241b12;
 
-  --color-gryffindor: #7f1d2b;
-  --color-gryffindor-light: #d4a94a;
-  --color-ravenclaw: #1f3a63;
-  --color-ravenclaw-light: #9aa5c9;
-  --color-hufflepuff: #d9a441;
-  --color-hufflepuff-light: #f0d78c;
-  --color-slytherin: #1c5c40;
-  --color-slytherin-light: #b9c2b0;
+  --color-courage: #7f1d2b;
+  --color-courage-light: #d4a94a;
+  --color-wisdom: #1f3a63;
+  --color-wisdom-light: #9aa5c9;
+  --color-patience: #d9a441;
+  --color-patience-light: #f0d78c;
+  --color-composure: #1c5c40;
+  --color-composure-light: #b9c2b0;
 }
 
 html,

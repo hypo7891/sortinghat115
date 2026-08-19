@@ -21,10 +21,10 @@ function makeOptions(
   d: string,
 ): HouseQuestionOption[] {
   return [
-    { letter: 'A', text: a, house: 'gryffindor' },
-    { letter: 'B', text: b, house: 'ravenclaw' },
-    { letter: 'C', text: c, house: 'hufflepuff' },
-    { letter: 'D', text: d, house: 'slytherin' },
+    { letter: 'A', text: a, house: 'courage' },
+    { letter: 'B', text: b, house: 'wisdom' },
+    { letter: 'C', text: c, house: 'patience' },
+    { letter: 'D', text: d, house: 'composure' },
   ];
 }
 

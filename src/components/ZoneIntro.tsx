@@ -15,7 +15,7 @@ export function ZoneIntro({ label, intro, onContinue }: ZoneIntroProps) {
         transition={{ duration: 0.5 }}
         className="max-w-md"
       >
-        <h2 className="mb-4 font-serif text-2xl font-semibold text-[var(--color-hufflepuff-light)]">
+        <h2 className="mb-4 font-serif text-2xl font-semibold text-[var(--color-patience-light)]">
           {label}
         </h2>
         <p className="mb-8 leading-relaxed text-[var(--color-parchment)]/90">{intro}</p>

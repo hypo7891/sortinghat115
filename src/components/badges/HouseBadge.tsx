@@ -20,7 +20,7 @@ function hexPoints(cx: number, cy: number, r: number): string {
 }
 
 const BADGE_STYLES: Record<HouseId, BadgeStyle> = {
-  gryffindor: {
+  courage: {
     primary: '#7f1d2b',
     secondary: '#e8c468',
     icon: (idPrefix) => (
@@ -30,7 +30,7 @@ const BADGE_STYLES: Record<HouseId, BadgeStyle> = {
       </g>
     ),
   },
-  ravenclaw: {
+  wisdom: {
     primary: '#1f3a63',
     secondary: '#c9d3ef',
     icon: (idPrefix) => (
@@ -41,7 +41,7 @@ const BADGE_STYLES: Record<HouseId, BadgeStyle> = {
       </g>
     ),
   },
-  hufflepuff: {
+  patience: {
     primary: '#a9722a',
     secondary: '#fbe2a0',
     icon: (idPrefix) => (
@@ -52,7 +52,7 @@ const BADGE_STYLES: Record<HouseId, BadgeStyle> = {
       </g>
     ),
   },
-  slytherin: {
+  composure: {
     primary: '#1c5c40',
     secondary: '#cfe3d4',
     icon: (idPrefix) => (

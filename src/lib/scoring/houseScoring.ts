@@ -15,10 +15,10 @@ export function scoreHouse(
   questions: HouseQuestion[] = HOUSE_QUESTIONS,
 ): HouseScoreResult {
   const scores: Record<HouseId, number> = {
-    gryffindor: 0,
-    ravenclaw: 0,
-    hufflepuff: 0,
-    slytherin: 0,
+    courage: 0,
+    wisdom: 0,
+    patience: 0,
+    composure: 0,
   };
 
   for (const question of questions) {
