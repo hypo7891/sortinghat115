@@ -100,13 +100,22 @@ export function TeacherClassDashboardPage() {
       <div className="mb-8 flex items-center justify-between">
         <h1 className="font-serif text-2xl font-bold">{klass?.className ?? '載入中...'}</h1>
         {klass && (
-          <button
-            type="button"
-            onClick={handleCopy}
-            className="rounded-full bg-white/10 px-4 py-2 text-sm tracking-widest hover:bg-white/20"
-          >
-            代碼 {klass.joinCode} {copied ? '已複製' : '（點擊複製）'}
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleCopy}
+              className="rounded-full bg-white/10 px-4 py-2 text-sm tracking-widest hover:bg-white/20"
+            >
+              代碼 {klass.joinCode} {copied ? '已複製' : '（點擊複製）'}
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate(`/teacher/classes/${classId}/present`)}
+              className="rounded-full bg-[var(--color-accent)] px-4 py-2 text-sm font-semibold text-[var(--color-accent-ink)] hover:opacity-90"
+            >
+              顯示代碼／QR
+            </button>
+          </div>
         )}
       </div>
 

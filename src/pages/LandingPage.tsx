@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { resolveJoinCode } from '../firebase/firestore';
 import { useQuizStore } from '../lib/quizStore';
 import { PageCard } from '../components/ui/PageCard';
@@ -7,9 +7,10 @@ import courtyardBg from '../assets/courtyard-bg.png';
 
 export function LandingPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const startQuiz = useQuizStore((s) => s.startQuiz);
   const [name, setName] = useState('');
-  const [code, setCode] = useState('');
+  const [code, setCode] = useState(() => (searchParams.get('code') ?? '').toUpperCase());
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 

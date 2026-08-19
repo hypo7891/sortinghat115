@@ -18,6 +18,7 @@ export function TeacherClassesPage() {
   const [classes, setClasses] = useState<ClassDoc[]>([]);
   const [newClassName, setNewClassName] = useState('');
   const [creating, setCreating] = useState(false);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading && !user) navigate('/teacher', { replace: true });
@@ -29,6 +30,12 @@ export function TeacherClassesPage() {
       ? subscribeAllClasses(setClasses)
       : subscribeTeacherClasses(user.uid, setClasses);
   }, [user, isAdmin]);
+
+  const handleCopy = async (code: string, classId: string) => {
+    await navigator.clipboard.writeText(code);
+    setCopiedId(classId);
+    setTimeout(() => setCopiedId((current) => (current === classId ? null : current)), 1500);
+  };
 
   const handleCreate = async (e: FormEvent) => {
     e.preventDefault();
@@ -81,22 +88,37 @@ export function TeacherClassesPage() {
             </p>
           )}
           {classes.map((c) => (
-            <button
+            <div
               key={c.id}
-              type="button"
-              onClick={() => navigate(`/teacher/classes/${c.id}`)}
-              className="flex items-center justify-between rounded-xl border border-[var(--color-parchment)]/20 bg-white/5 px-4 py-3 text-left hover:bg-white/10"
+              className="flex items-center justify-between gap-2 rounded-xl border border-[var(--color-parchment)]/20 bg-white/5 px-4 py-3"
             >
-              <span className="flex flex-col">
+              <button
+                type="button"
+                onClick={() => navigate(`/teacher/classes/${c.id}`)}
+                className="flex flex-1 flex-col text-left"
+              >
                 <span className="font-medium">{c.className}</span>
                 {isAdmin && c.teacherEmail && (
                   <span className="text-xs text-[var(--color-parchment)]/50">{c.teacherEmail}</span>
                 )}
-              </span>
-              <span className="rounded-full bg-white/10 px-3 py-1 text-xs tracking-widest">
-                {c.joinCode}
-              </span>
-            </button>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleCopy(c.joinCode, c.id)}
+                className="rounded-full bg-white/10 px-3 py-1 text-xs tracking-widest hover:bg-white/20"
+                title="複製班級代碼"
+              >
+                {copiedId === c.id ? '已複製' : c.joinCode}
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate(`/teacher/classes/${c.id}/present`)}
+                className="rounded-full bg-[var(--color-accent)] px-3 py-1 text-xs font-semibold text-[var(--color-accent-ink)] hover:opacity-90"
+                title="顯示代碼與 QR Code"
+              >
+                QR
+              </button>
+            </div>
           ))}
         </div>
       </PageCard>

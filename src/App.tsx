@@ -5,6 +5,7 @@ import { ResultsPage } from './pages/ResultsPage';
 import { TeacherLoginPage } from './pages/teacher/TeacherLoginPage';
 import { TeacherClassesPage } from './pages/teacher/TeacherClassesPage';
 import { TeacherClassDashboardPage } from './pages/teacher/TeacherClassDashboardPage';
+import { ClassPresentPage } from './pages/teacher/ClassPresentPage';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
       <Route path="/teacher" element={<TeacherLoginPage />} />
       <Route path="/teacher/classes" element={<TeacherClassesPage />} />
       <Route path="/teacher/classes/:classId" element={<TeacherClassDashboardPage />} />
+      <Route path="/teacher/classes/:classId/present" element={<ClassPresentPage />} />
     </Routes>
   );
 }
