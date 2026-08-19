@@ -12,7 +12,7 @@ import {
   where,
 } from 'firebase/firestore';
 import { db } from './config';
-import type { HouseId } from '../data/houseTypes';
+import { normalizeHouseId, type HouseId } from '../data/houseTypes';
 import type { HouseAnswers } from '../lib/scoring/houseScoring';
 import type { MbtiAnswers } from '../lib/scoring/mbtiScoring';
 import type { MbtiAxis, MbtiPole } from '../data/mbtiQuestions';
@@ -139,8 +139,29 @@ export function subscribeClassSubmissions(
     orderBy('completedAt', 'desc'),
   );
   return onSnapshot(q, (snap) => {
-    callback(
-      snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<SubmissionDoc, 'id'>) })),
-    );
+    callback(snap.docs.map((d) => normalizeSubmission(d.id, d.data() as Omit<SubmissionDoc, 'id'>)));
   });
+}
+
+// Normalizes house ids on a submission doc so pre-rename records (which
+// stored the old gryffindor/ravenclaw/hufflepuff/slytherin ids) display
+// correctly without needing to migrate the stored documents.
+function normalizeSubmission(
+  id: string,
+  data: Omit<SubmissionDoc, 'id'>,
+): SubmissionDoc {
+  const houseScores = Object.fromEntries(
+    Object.entries(data.houseScores ?? {}).map(([house, score]) => [
+      normalizeHouseId(house),
+      score,
+    ]),
+  ) as Record<HouseId, number>;
+
+  return {
+    id,
+    ...data,
+    houseScores,
+    primaryHouse: normalizeHouseId(data.primaryHouse),
+    secondaryHouse: normalizeHouseId(data.secondaryHouse),
+  };
 }
