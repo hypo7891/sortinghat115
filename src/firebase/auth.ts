@@ -7,11 +7,22 @@ import {
 } from 'firebase/auth';
 import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { auth, db } from './config';
+import { ALLOWED_TEACHER_EMAILS } from '../lib/admin';
 
 const provider = new GoogleAuthProvider();
 
+export class UnauthorizedTeacherError extends Error {
+  constructor() {
+    super('UNAUTHORIZED_EMAIL');
+  }
+}
+
 export async function signInTeacher(): Promise<User> {
   const result = await signInWithPopup(auth, provider);
+  if (!result.user.email || !ALLOWED_TEACHER_EMAILS.includes(result.user.email)) {
+    await signOut(auth);
+    throw new UnauthorizedTeacherError();
+  }
   await setDoc(
     doc(db, 'teachers', result.user.uid),
     {

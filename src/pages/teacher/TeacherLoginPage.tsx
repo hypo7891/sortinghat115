@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { signInTeacher } from '../../firebase/auth';
+import { signInTeacher, UnauthorizedTeacherError } from '../../firebase/auth';
 import { useTeacherAuth } from '../../hooks/useTeacherAuth';
 import { PageCard } from '../../components/ui/PageCard';
 
@@ -19,8 +19,12 @@ export function TeacherLoginPage() {
     setSigningIn(true);
     try {
       await signInTeacher();
-    } catch {
-      setError('登入失敗，請再試一次。');
+    } catch (e) {
+      setError(
+        e instanceof UnauthorizedTeacherError
+          ? '此帳號尚未獲得使用授權，請聯絡管理員。'
+          : '登入失敗，請再試一次。',
+      );
     } finally {
       setSigningIn(false);
     }

@@ -17,6 +17,19 @@ service cloud.firestore {
       ];
     }
 
+    // Only these accounts may sign in and use the teacher/admin side of the
+    // app at all (create classes, read their own data, etc). Keep this in
+    // sync with ALLOWED_TEACHER_EMAILS in src/lib/admin.ts.
+    function isAllowedTeacher() {
+      return isSignedIn() && request.auth.token.email in [
+        'chiashen@tmail.hc.edu.tw',
+        'j27271@tmail.ilc.edu.tw',
+        'riannon@tmail.hc.edu.tw',
+        'ugsummer@gmail.com',
+        'ysjt11435@tmail.hc.edu.tw'
+      ];
+    }
+
     function isValidSubmission(data) {
       return data.keys().hasAll([
           'studentDisplayName', 'startedAt', 'completedAt',
@@ -39,26 +52,26 @@ service cloud.firestore {
     }
 
     match /teachers/{teacherId} {
-      allow read, write: if isSignedIn() && request.auth.uid == teacherId;
+      allow read, write: if isAllowedTeacher() && request.auth.uid == teacherId;
     }
 
     match /joinCodes/{code} {
       allow get: if true;
       allow list: if false;
-      allow create, update: if isSignedIn() && request.resource.data.teacherUid == request.auth.uid;
-      allow delete: if isSignedIn()
+      allow create, update: if isAllowedTeacher() && request.resource.data.teacherUid == request.auth.uid;
+      allow delete: if isAllowedTeacher()
         && resource.data.teacherUid == request.auth.uid;
     }
 
     match /classes/{classId} {
-      allow read: if isAdmin() || (isSignedIn() && resource.data.teacherUid == request.auth.uid);
-      allow update, delete: if isSignedIn() && resource.data.teacherUid == request.auth.uid;
-      allow create: if isSignedIn() && request.resource.data.teacherUid == request.auth.uid;
+      allow read: if isAdmin() || (isAllowedTeacher() && resource.data.teacherUid == request.auth.uid);
+      allow update, delete: if isAllowedTeacher() && resource.data.teacherUid == request.auth.uid;
+      allow create: if isAllowedTeacher() && request.resource.data.teacherUid == request.auth.uid;
 
       match /submissions/{submissionId} {
         allow create: if isValidSubmission(request.resource.data);
         allow read: if isAdmin()
-          || (isSignedIn()
+          || (isAllowedTeacher()
               && get(/databases/$(database)/documents/classes/$(classId)).data.teacherUid == request.auth.uid);
         allow update, delete: if false;
       }
