@@ -5,7 +5,7 @@
 export const ADMIN_EMAILS = ['chiashen@tmail.hc.edu.tw', 'j27271@tmail.ilc.edu.tw'];
 
 export const REGULAR_TEACHER_EMAILS = [
-  'riannon@tmail.hc.edu.tw',
+  'rhiannon@tmail.hc.edu.tw',
   'ugsummer@gmail.com',
   'ysjt11435@tmail.hc.edu.tw',
 ];

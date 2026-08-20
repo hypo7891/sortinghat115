@@ -24,7 +24,7 @@ service cloud.firestore {
       return isSignedIn() && request.auth.token.email in [
         'chiashen@tmail.hc.edu.tw',
         'j27271@tmail.ilc.edu.tw',
-        'riannon@tmail.hc.edu.tw',
+        'rhiannon@tmail.hc.edu.tw',
         'ugsummer@gmail.com',
         'ysjt11435@tmail.hc.edu.tw'
       ];
